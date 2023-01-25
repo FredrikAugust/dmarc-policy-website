@@ -14,3 +14,4 @@ tracing-opentelemetry = "0.18.0"
 tracing-subscriber = { version = "0.3.16", features = ["env-filter"] }
 tokio = { version = "1.24.2", features = ["full"] }
 trust-dns-resolver = "0.22.0"
+memcache = "0.17.0"

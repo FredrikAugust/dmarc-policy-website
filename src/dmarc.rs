@@ -48,7 +48,7 @@ fn extract_dmarc_record(txt_lookup: &TxtLookup) -> Result<String> {
 fn retrieve_p_value(dmarc_record: &str) -> Result<String> {
     let p_value = dmarc_record
         .split(';')
-        .map(str::trim)
+        .map(str::trim) // some records have spaces after the semicolon
         .find(|s| s.starts_with("p="))
         .ok_or_else(|| eyre::eyre!("No p= value found"))?
         .split('=')
