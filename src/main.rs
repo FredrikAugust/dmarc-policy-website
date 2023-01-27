@@ -1,6 +1,9 @@
+use actix_web::{web, App, HttpServer};
 use color_eyre::Result;
 use tracing::info;
 
+mod actions;
+mod data;
 mod dmarc;
 mod setup;
 
@@ -12,19 +15,18 @@ async fn main() -> Result<()> {
     let client =
         memcache::connect("memcache://127.0.0.1:11211?timeout=10&tcp_nodelay=true").unwrap();
 
-    let domains = ["adressa.no", "nsm.no", "posten.no", "xxl.no"];
+    info!("Connected to memcached server");
 
-    for domain in domains {
-        match dmarc::get_dmarc_policy_for_domain(domain).await {
-            Ok(policy) => {
-                client
-                    .set::<String>(domain, format!("{:?}", policy), 60 * 60 * 24)
-                    .unwrap();
-                info!("{domain}: {policy:?}");
-            }
-            Err(_) => info!("Missing DMARC for {domain}"),
-        }
-    }
+    HttpServer::new(move || {
+        App::new()
+            .app_data(web::Data::new(data::MemcacheClient {
+                client: client.to_owned(),
+            }))
+            .service(actions::dmarc_lookup::get_dmarc_status)
+    })
+    .bind(("127.1", 8080))?
+    .run()
+    .await?;
 
     // Cleanup :)
     opentelemetry::global::shutdown_tracer_provider();
