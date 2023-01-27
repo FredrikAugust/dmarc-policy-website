@@ -17,3 +17,4 @@ trust-dns-resolver = "0.22.0"
 memcache = "0.17.0"
 actix-web = "4"
 serde = { version = "1.0", features = ["derive"] }
+actix-cors = "0.6.4"

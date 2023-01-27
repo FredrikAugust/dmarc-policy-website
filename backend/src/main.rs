@@ -1,3 +1,4 @@
+use actix_cors::Cors;
 use actix_web::{web, App, HttpServer};
 use color_eyre::Result;
 use tracing::info;
@@ -19,6 +20,7 @@ async fn main() -> Result<()> {
 
     HttpServer::new(move || {
         App::new()
+            .wrap(Cors::permissive())
             .app_data(web::Data::new(data::MemcacheClient {
                 client: client.to_owned(),
             }))
